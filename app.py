@@ -1,42 +1,24 @@
 import streamlit as st
+import requests
 
-st.set_page_config(page_title="✨ 나를 소개합니다", page_icon="✨")
+st.title("🎬 TMDB API 테스트")
 
-st.title("✨ 나를 소개합니다")
+# 사이드바에서 API 키 입력
+TMDB_API_KEY = st.sidebar.text_input("TMDB API Key", type="password")
 
-# 입력 UI
-name = st.text_input("이름을 입력하세요")
-major = st.text_input("학과를 입력하세요")
-
-mbti_list = [
-    "ISTJ","ISFJ","INFJ","INTJ",
-    "ISTP","ISFP","INFP","INTP",
-    "ESTP","ESFP","ENFP","ENTP",
-    "ESTJ","ESFJ","ENFJ","ENTJ"
-]
-mbti = st.selectbox("MBTI를 선택하세요", mbti_list)
-
-interests = st.multiselect(
-    "관심 분야를 선택하세요 (복수 선택 가능)",
-    ["AI", "웹개발", "데이터분석", "게임", "디자인"]
-)
-
-# ✅ 기분 상태 선택 UI 추가
-mood = st.selectbox(
-    "오늘의 기분 상태를 선택하세요",
-    ["아주 좋아요 😄", "좋아요 🙂", "그냥 그래요 😐", "피곤해요 😴", "우울해요 😢", "스트레스 받아요 😖"]
-)
-
-# 버튼
-if st.button("소개 생성"):
-    if not name or not major:
-        st.warning("이름과 학과는 꼭 입력해 주세요!")
-    else:
-        interests_text = ", ".join(interests) if interests else "아직 탐색 중이에요"
-        intro = (
-            f"안녕하세요! 저는 **{major}**에 재학 중인 **{name}**입니다. "
-            f"MBTI는 **{mbti}**이고, 관심 분야는 **{interests_text}**예요. "
-            f"오늘은 기분이 **{mood}** 😊 앞으로 잘 부탁드려요!"
-        )
-        st.success("소개가 생성되었습니다!")
-        st.write(intro)
+if TMDB_API_KEY:
+    if st.button("인기 영화 가져오기"):
+        # TMDB에서 인기 영화 가져오기
+        url = f"https://api.themoviedb.org/3/movie/popular?api_key={TMDB_API_KEY}&language=ko-KR"
+        response = requests.get(url)
+        data = response.json()
+        
+        # 첫 번째 영화 정보 출력
+        movie = data['results'][0]
+        st.write(f"🎬 제목: {movie['title']}")
+        st.write(f"⭐ 평점: {movie['vote_average']}/10")
+        st.write(f"📅 개봉일: {movie['release_date']}")
+        st.write(f"📝 줄거리: {movie['overview'][:100]}...")
+else:
+    st.info("사이드바에 TMDB API Key를 입력해주세요.")
+    
