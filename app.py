@@ -1,4 +1,5 @@
 import streamlit as st
+pip install openai
 from openai import OpenAI
 
 st.title("🤖 나의 AI 챗봇")
